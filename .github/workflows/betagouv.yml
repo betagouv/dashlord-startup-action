@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run beta.gouv API fetcher
-        uses: .
+        uses: ./
         with:
           id: signaux-faibles
           output: betagouv.json
