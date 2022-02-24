@@ -1,0 +1,25 @@
+name: "beta.gouv API scan"
+description: "Fetch SE info from the beta.gouv.fr public API"
+
+inputs:
+  id:
+    description: "The unique identifier of the SE on the beta.gouv website."
+    required: true
+  api_url:
+    description: "The betagouv website api url for SE."
+    default: "https://beta.gouv.fr/api/v2.3/startups.json"
+    required: false
+  output:
+    description: "Path to output file. defaults to betagouv.json."
+    default: "betagouv.json"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Scan betagouv api
+      shell: bash
+      run: |
+        sudo apt-get install -y jq wget
+        wget -O - ${{ inputs.api_url }} | jq '.data[] | select(.id == "${{ inputs.id }}")' > ${{ inputs.output }}
+        echo "created in ${{ inputs.output }}"
