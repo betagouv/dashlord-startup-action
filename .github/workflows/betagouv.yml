@@ -1,8 +1,6 @@
 on:
   push:
     branches: ["*"]
-  pull_request:
-    branches: ["*"]
 
 name: Tests betagouv API action
 jobs:
@@ -12,11 +10,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run beta.gouv API fetcher
+        id: betagouv
         uses: ./
         with:
-          id: signaux-faibles
+          id: mon-entreprise
           output: betagouv.json
       - shell: bash
         run: |
           python -m json.tool < betagouv.json
           cat betagouv.json
+          stats_url="${{ steps.betagouv.outputs.stats_url }}"
+          budget_url="${{ steps.betagouv.outputs.budget_url }}"
+          echo "stats_url: $stats_url"
+          echo "budget_url: $budget_url"
+          [[ "$stats_url" != "https://mon-entreprise.urssaf.fr/stats" ]] && exit 1
+          [[ "$budget_url" != "https://mon-entreprise.urssaf.fr/budget" ]] && exit 1
+          exit 0
