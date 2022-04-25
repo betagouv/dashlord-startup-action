@@ -13,13 +13,29 @@ inputs:
     description: "Path to output file. defaults to betagouv.json."
     default: "betagouv.json"
     required: false
+outputs:
+  stats_url:
+    description: "The stat page URL if any"
+    value: ${{ steps.betagouv.outputs.stats_url }}
+  budget_url:
+    description: "The budget page URL if any"
+    value: ${{ steps.betagouv.outputs.budget_url }}
 
 runs:
   using: "composite"
   steps:
     - name: Scan betagouv api
       shell: bash
+      id: betagouv
       run: |
-        sudo apt-get install -y jq wget
+        sudo apt-get install -y jq wget python
         wget -O - ${{ inputs.api_url }} | jq '.data[] | select(.id == "${{ inputs.id }}")' > ${{ inputs.output }}
+
+        stats_url=$( cat ${{ inputs.output }} | jq -r ".attributes.stats_url" )
+        budget_url=$( cat ${{ inputs.output }} | jq -r ".attributes.budget_url" )
+        echo "::set-output name=stats_url::$(echo $stats_url)"
+        echo "::set-output name=budget_url::$(echo $budget_url)"
+
         echo "created in ${{ inputs.output }}"
+        echo "stats_url: $stats_url"
+        echo "budget_url: $budget_url"
