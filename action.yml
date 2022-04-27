@@ -20,6 +20,9 @@ outputs:
   budget_url:
     description: "The budget page URL if any"
     value: ${{ steps.betagouv.outputs.budget_url }}
+  se_current_phase:
+    description: "The SE current phase if specified"
+    value: ${{ steps.betagouv.outputs.se_current_phase }}
 
 runs:
   using: "composite"
@@ -28,14 +31,17 @@ runs:
       shell: bash
       id: betagouv
       run: |
-        sudo apt-get install -y jq wget python
+        sudo apt-get install -y jq wget
         wget -O - ${{ inputs.api_url }} | jq '.data[] | select(.id == "${{ inputs.id }}")' > ${{ inputs.output }}
 
         stats_url=$( cat ${{ inputs.output }} | jq -r ".attributes.stats_url" )
         budget_url=$( cat ${{ inputs.output }} | jq -r ".attributes.budget_url" )
+        se_current_phase=$( cat ${{ inputs.output }} | jq -r ".attributes.phases" | jq "sort_by(.start)" | jq ".[-1].name" )
         echo "::set-output name=stats_url::$(echo $stats_url)"
         echo "::set-output name=budget_url::$(echo $budget_url)"
+        echo "::set-output name=se_current_phase::$(echo $se_current_phase)"
 
         echo "created in ${{ inputs.output }}"
         echo "stats_url: $stats_url"
         echo "budget_url: $budget_url"
+        echo "se_current_phase: $se_current_phase"
