@@ -21,8 +21,11 @@ jobs:
           cat betagouv.json
           stats_url="${{ steps.betagouv.outputs.stats_url }}"
           budget_url="${{ steps.betagouv.outputs.budget_url }}"
+          se_current_phase="${{ steps.betagouv.outputs.se_current_phase }}"
           echo "stats_url: $stats_url"
           echo "budget_url: $budget_url"
+          echo "se_current_phase: $se_current_phase"
           [[ "$stats_url" != "https://mon-entreprise.urssaf.fr/stats" ]] && exit 1
           [[ "$budget_url" != "https://mon-entreprise.urssaf.fr/budget" ]] && exit 1
+          [[ "$se_current_phase" != "success" ]] && exit 1
           exit 0
