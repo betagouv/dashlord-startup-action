@@ -20,9 +20,9 @@ outputs:
   budget_url:
     description: "The budget page URL if any"
     value: ${{ steps.betagouv.outputs.budget_url }}
-  se_current_phase:
-    description: "The SE current phase if specified"
-    value: ${{ steps.betagouv.outputs.se_current_phase }}
+  github_repository:
+    description: "The Github repository"
+    value: ${{ steps.betagouv.outputs.github_repository }}
 
 runs:
   using: "composite"
@@ -36,12 +36,12 @@ runs:
 
         stats_url=$( cat ${{ inputs.output }} | jq -r ".attributes.stats_url" )
         budget_url=$( cat ${{ inputs.output }} | jq -r ".attributes.budget_url" )
-        se_current_phase=$( cat ${{ inputs.output }} | jq -r ".attributes.phases" | jq "sort_by(.start)" | jq ".[-1].name" )
+        github_repository=$( cat ${{ inputs.output }} | jq -r ".attributes.repository" )
         echo "::set-output name=stats_url::$(echo $stats_url)"
         echo "::set-output name=budget_url::$(echo $budget_url)"
-        echo "::set-output name=se_current_phase::$(echo $se_current_phase)"
+        echo "::set-output name=github_repository::$(echo $github_repository)"
 
         echo "created in ${{ inputs.output }}"
         echo "stats_url: $stats_url"
         echo "budget_url: $budget_url"
-        echo "se_current_phase: $se_current_phase"
+        echo "github_repository: $github_repository"
